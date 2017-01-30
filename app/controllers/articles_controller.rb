@@ -1,5 +1,6 @@
 class ArticlesController < ApplicationController
   before_action :set_article, only: [:show, :edit, :update, :destroy]
+  before_action :validate_user, except: [:show, :index]
 
   # GET /articles
   # GET /articles.json
@@ -10,6 +11,7 @@ class ArticlesController < ApplicationController
   # GET /articles/1
   # GET /articles/1.json
   def show
+    @article.update_visit_count
   end
 
   # GET /articles/new
@@ -24,7 +26,7 @@ class ArticlesController < ApplicationController
   # POST /articles
   # POST /articles.json
   def create
-    @article = Article.new(article_params)
+    @article = current_user.articles.new(article_params)
 
     respond_to do |format|
       if @article.save
@@ -71,4 +73,8 @@ class ArticlesController < ApplicationController
     def article_params
       params.require(:article).permit(:title, :body, :visits_count)
     end
+
+  def validate_user
+    redirect_to new_user_session_path
+  end
 end
